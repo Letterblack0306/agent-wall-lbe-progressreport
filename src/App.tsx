@@ -6,9 +6,10 @@ import ArchitectureCheck from './components/ArchitectureCheck'
 import BlockersSection from './components/BlockersSection'
 import Recommendations from './components/Recommendations'
 import TimelineView from './components/TimelineView'
+import PlanningSessions from './components/PlanningSessions'
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<'overview' | 'backend' | 'frontend' | 'architecture' | 'timeline'>('overview')
+  const [activeTab, setActiveTab] = useState<'overview' | 'backend' | 'frontend' | 'architecture' | 'timeline' | 'planning'>('overview')
 
   return (
     <div className="min-h-screen bg-[#0b0b0c] text-[#e1e1e6] font-mono">
@@ -23,6 +24,7 @@ export default function App() {
             { id: 'frontend', label: 'Frontend (Rust/PS)' },
             { id: 'architecture', label: 'Architecture' },
             { id: 'timeline', label: 'Timeline' },
+            { id: 'planning', label: 'Planning Sessions' },
           ].map((tab) => (
             <button
               key={tab.id}
@@ -68,6 +70,9 @@ export default function App() {
         )}
         {activeTab === 'timeline' && (
           <TimelineView />
+        )}
+        {activeTab === 'planning' && (
+          <PlanningSessions />
         )}
       </main>
 
