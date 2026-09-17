@@ -1,7 +1,7 @@
 import StatusBadge from './StatusBadge'
 
 interface RepoAuditProps {
-  repo: 'backend' | 'frontend'
+  repo: 'backend' | 'frontend' | 'knowledge' | 'birdeye'
   full?: boolean
 }
 
@@ -61,8 +61,63 @@ const frontendData: typeof backendData = {
   ],
 }
 
+const knowledgeData: typeof backendData = {
+  name: 'GPT-Knowledge',
+  subtitle: 'Knowledge & Reference Base',
+  url: 'https://github.com/Letterblack0306/GPT-Knowledge',
+  tech: 'JavaScript 71% · Python 17.2% · HTML 11.8%',
+  commits: 821,
+  branches: 10,
+  lastCommit: '2 hours ago',
+  lastCommitMsg: 'Record Brew Batch B browser relay blocker',
+  ciStatus: 'PASS',
+  gateStatus: 'ACTIVE',
+  checks: [
+    { item: 'Industrial Dark UI system documentation', status: 'PASS', note: 'Canonical Letterblack branding guide deployed' },
+    { item: 'Agent engineering unified methods', status: 'PASS', note: 'Single canonical guide consolidating Aider/Claude Code/Codex/etc.' },
+    { item: 'MCP ecosystem routing', status: 'PASS', note: 'Validated 53 required PASS / 0 FAIL topology' },
+    { item: 'Browser agent knowledge', status: 'PASS', note: 'CDP, connector patterns, security, verification documented' },
+    { item: 'Local model integration (LM Studio)', status: 'PASS', note: 'Runtime, auth, model lifecycle, tool calling documented' },
+    { item: 'Curated agent references (GPT_Ref)', status: 'PASS', note: 'Machine-readable catalogue with strict scope' },
+    { item: 'CI/CD pipeline', status: 'PASS', note: 'Validate workflow passing, latest commit success' },
+    { item: 'Vercel deployment', status: 'PASS', note: 'gpt-knowledge.vercel.app live and read-only' },
+    { item: 'Knowledge quality rules enforced', status: 'PASS', note: 'Source, confidence, verification, applicability required' },
+    { item: 'Section-level routing manifest', status: 'PASS', note: 'knowledge-index.json + knowledge-sections.json active' },
+    { item: 'Skills routing integration', status: 'PASS', note: 'Routes to registered skills index via BirdEye MCP' },
+  ],
+}
+
+const birdeyeData: typeof backendData = {
+  name: 'Letterblack_BirdEye',
+  subtitle: 'MCP Server & Consolidated Route',
+  url: 'https://github.com/Letterblack0306/Letterblack_BirdEye',
+  tech: 'Python 100%',
+  commits: 48,
+  branches: 5,
+  lastCommit: '2 days ago',
+  lastCommitMsg: 'test: remove dead MCP contract expectations',
+  ciStatus: 'PASS',
+  gateStatus: 'STABLE',
+  checks: [
+    { item: 'MCP server (workspace/memory/skills query)', status: 'PASS', note: 'Consolidated client-facing Letterblack MCP route' },
+    { item: 'Project workspace projection', status: 'PASS', note: 'Config-driven registry mapping GPT-K projects to local roots' },
+    { item: 'Governed local execution', status: 'PASS', note: 'Safe workspace terminal access with command policy' },
+    { item: 'Workspace identity & revision status', status: 'PASS', note: 'Git timeout handling, graceful degradation' },
+    { item: 'Execution evidence & history', status: 'PASS', note: 'Chronological runtime event history with SHA256' },
+    { item: 'Skills & memory unification', status: 'PASS', note: 'Unified BirdEye Skills and indexed roots' },
+    { item: 'Test suite', status: 'PASS', note: '41 tests passing (28 workspace_run + 13 others)' },
+    { item: 'Generated index boundaries', status: 'PASS', note: 'Clear separation of generated vs curated content' },
+    { item: 'Dead MCP contract cleanup', status: 'PASS', note: 'Removed obsolete contract expectations' },
+    { item: 'Database reconciliation', status: 'PASS', note: 'Handles deleted workspace rows gracefully' },
+    { item: 'Query projection bootstrap', status: 'PASS', note: 'Missing query projection handled' },
+  ],
+}
+
 export default function RepoAudit({ repo, full }: RepoAuditProps) {
-  const data = repo === 'backend' ? backendData : frontendData
+  const data = repo === 'backend' ? backendData : 
+               repo === 'frontend' ? frontendData :
+               repo === 'knowledge' ? knowledgeData :
+               birdeyeData
 
   return (
     <div className="bg-[#141416] border border-[#2a2a2d] rounded-lg overflow-hidden">

@@ -7,9 +7,10 @@ import BlockersSection from './components/BlockersSection'
 import Recommendations from './components/Recommendations'
 import TimelineView from './components/TimelineView'
 import PlanningSessions from './components/PlanningSessions'
+import EcosystemMap from './components/EcosystemMap'
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<'overview' | 'backend' | 'frontend' | 'architecture' | 'timeline' | 'planning'>('overview')
+  const [activeTab, setActiveTab] = useState<'overview' | 'backend' | 'frontend' | 'knowledge' | 'birdeye' | 'ecosystem' | 'architecture' | 'timeline' | 'planning'>('overview')
 
   return (
     <div className="min-h-screen bg-[#0b0b0c] text-[#e1e1e6] font-mono">
@@ -17,14 +18,17 @@ export default function App() {
       
       {/* Navigation */}
       <nav className="border-b border-[#2a2a2d] px-6 py-3">
-        <div className="max-w-7xl mx-auto flex gap-1">
+        <div className="max-w-7xl mx-auto flex gap-1 flex-wrap">
           {[
             { id: 'overview', label: 'Overview' },
-            { id: 'backend', label: 'Backend (Python)' },
-            { id: 'frontend', label: 'Frontend (Rust/PS)' },
+            { id: 'ecosystem', label: 'Ecosystem' },
+            { id: 'backend', label: 'Backend' },
+            { id: 'frontend', label: 'Frontend' },
+            { id: 'knowledge', label: 'GPT-Knowledge' },
+            { id: 'birdeye', label: 'BirdEye MCP' },
             { id: 'architecture', label: 'Architecture' },
             { id: 'timeline', label: 'Timeline' },
-            { id: 'planning', label: 'Planning Sessions' },
+            { id: 'planning', label: 'Planning' },
           ].map((tab) => (
             <button
               key={tab.id}
@@ -54,6 +58,9 @@ export default function App() {
             <Recommendations />
           </div>
         )}
+        {activeTab === 'ecosystem' && (
+          <EcosystemMap />
+        )}
         {activeTab === 'backend' && (
           <div className="space-y-6">
             <RepoAudit repo="backend" full />
@@ -63,6 +70,16 @@ export default function App() {
         {activeTab === 'frontend' && (
           <div className="space-y-6">
             <RepoAudit repo="frontend" full />
+          </div>
+        )}
+        {activeTab === 'knowledge' && (
+          <div className="space-y-6">
+            <RepoAudit repo="knowledge" full />
+          </div>
+        )}
+        {activeTab === 'birdeye' && (
+          <div className="space-y-6">
+            <RepoAudit repo="birdeye" full />
           </div>
         )}
         {activeTab === 'architecture' && (
