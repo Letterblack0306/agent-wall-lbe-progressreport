@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LBE Terminal UI Reconciliation — 2026-09-18</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+      background: #0b0b0c;
+      color: #e1e1e6;
+      line-height: 1.6;
+      padding: 2rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    h1 { color: #ff3b3b; font-size: 1.5rem; margin-bottom: 0.5rem; }
+    h2 { color: #e1e1e6; font-size: 1.2rem; margin: 2rem 0 1rem; border-bottom: 1px solid #2a2a2d; padding-bottom: 0.5rem; }
+    h3 { color: #8e8e93; font-size: 1rem; margin: 1.5rem 0 0.5rem; }
+    .metadata { color: #8e8e93; font-size: 0.85rem; margin-bottom: 2rem; }
+    .status { display: inline-block; padding: 0.25rem 0.75rem; border-radius: 3px; font-size: 0.85rem; font-weight: bold; }
+    .status-blocked { background: rgba(255, 59, 59, 0.2); color: #ff3b3b; border: 1px solid #ff3b3b; }
+    .status-pass { background: rgba(34, 197, 94, 0.2); color: #22c55e; border: 1px solid #22c55e; }
+    .status-warning { background: rgba(245, 158, 11, 0.2); color: #f59e0b; border: 1px solid #f59e0b; }
+    table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+    th, td { text-align: left; padding: 0.75rem; border: 1px solid #2a2a2d; }
+    th { background: #141416; color: #8e8e93; font-weight: normal; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.05em; }
+    td { background: #0f0f10; }
+    code { background: #1c1c1f; padding: 0.15rem 0.4rem; border-radius: 2px; color: #ff3b3b; }
+    .diagram { background: #141416; border: 1px solid #2a2a2d; padding: 1.5rem; margin: 1rem 0; font-size: 0.85rem; }
+    .warning { background: rgba(245, 158, 11, 0.1); border-left: 3px solid #f59e0b; padding: 1rem; margin: 1rem 0; }
+    .critical { background: rgba(255, 59, 59, 0.1); border-left: 3px solid #ff3b3b; padding: 1rem; margin: 1rem 0; }
+    ul { margin-left: 2rem; }
+    li { margin: 0.5rem 0; }
+    a { color: #3b82f6; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <h1>LBE Terminal UI Prototype Reconciliation</h1>
+  <div class="metadata">
+    Date: 2026-09-18<br>
+    Classification: ARCHITECTURE RECONCILIATION<br>
+    Status: <span class="status status-warning">DOCUMENTED</span>
+  </div>
+
+  <h2>Executive Summary</h2>
+  <p>
+    This document reconciles the uploaded React terminal UI prototype with the canonical LBE workspace architecture. 
+    The prototype serves as a <strong>visual reference only</strong> and does not represent production-ready code.
+  </p>
+
+  <div class="critical">
+    <strong>⚠ Critical Distinction:</strong><br>
+    The React prototype has <strong>NO runtime transport</strong>. All state is hard-coded. It cannot connect to 
+    the actual LBE runtime, Cline provider, or BirdEye MCP. It is a visual reference for implementing the locked 
+    September 5 contract in the actual product surface (Rust/Ratatui or HTML cockpit).
+  </div>
+
+  <h2>Prototype Classification</h2>
+  <table>
+    <tr>
+      <th>Attribute</th>
+      <th>React Prototype (Uploaded)</th>
+      <th>Canonical LBE TUI (Production)</th>
+    </tr>
+    <tr>
+      <td>Technology</td>
+      <td>React + TypeScript + Tailwind</td>
+      <td>Rust/Ratatui OR HTML cockpit</td>
+    </tr>
+    <tr>
+      <td>Runtime Connection</td>
+      <td><span class="status status-blocked">NONE</span> — Hard-coded state</td>
+      <td>RealLbeWrapper / PTY / ConPTY</td>
+    </tr>
+    <tr>
+      <td>State Source</td>
+      <td>Hard-coded in terminal-engine.ts</td>
+      <td>LBE runtime / Cline provider / BirdEye MCP</td>
+    </tr>
+    <tr>
+      <td>Authority</td>
+      <td>Visual reference only</td>
+      <td>LBE owns session/governance/evidence</td>
+    </tr>
+    <tr>
+      <td>Mode Support</td>
+      <td>PLAN / ACT only</td>
+      <td>PLAN / ACT / AUDIT (canonical)</td>
+    </tr>
+    <tr>
+      <td>Classification</td>
+      <td>REFERENCE_REUSE_INPUT_NOT_FINAL_PRODUCT_AUTHORITY</td>
+      <td>FINAL_PRODUCT_SURFACE</td>
+    </tr>
+  </table>
+
+  <h2>What the Prototype Gets Right</h2>
+  <ul>
+    <li>✅ <strong>Visual hierarchy</strong> — Header, ecosystem strip, timeline, composer structure</li>
+    <li>✅ <strong>Letterblack Industrial Dark system</strong> — Exact color palette from GPT-Knowledge</li>
+    <li>✅ <strong>State-semantic colors</strong> — Green=healthy, red=blocked, yellow=warning</li>
+    <li>✅ <strong>Process projection</strong> — Max 3 runtime event lines (per locked contract)</li>
+    <li>✅ <strong>[I] composer identity</strong> — With active-process motion indicator</li>
+    <li>✅ <strong>Context bar</strong> — Real usage representation (though hard-coded in prototype)</li>
+    <li>✅ <strong>Collapsed process summaries</strong> — One-line completed process view</li>
+    <li>✅ <strong>No emoji</strong> — Text symbols only (✓, ✗, ·, |)</li>
+    <li>✅ <strong>Monospace typography</strong> — JetBrains Mono for technical precision</li>
+  </ul>
+
+  <h2>What the Prototype Gets Wrong</h2>
+  <ul>
+    <li>❌ <strong>No runtime transport</strong> — No fetch, WebSocket, PTY, or child-process bridge</li>
+    <li>❌ <strong>Hard-coded state</strong> — All data is static in terminal-engine.ts</li>
+    <li>❌ <strong>Missing AUDIT mode</strong> — Canonical LBE requires PLAN / ACT / AUDIT</li>
+    <li>❌ <strong>Simulated delays</strong> — <code>setTimeout</code> with <code>Math.random()</code> for process duration</li>
+    <li>❌ <strong>No LbeWrapper integration</strong> — Cannot connect to RealLbeWrapper</li>
+    <li>❌ <strong>No Cline provider binding</strong> — Cannot receive real provider/model state</li>
+    <li>❌ <strong>No BirdEye MCP query</strong> — Cannot query workspace/memory/skills</li>
+    <li>❌ <strong>Not TTY/ConPTY</strong> — Browser-based, not terminal-native</li>
+  </ul>
+
+  <h2>Canonical Architecture Flow</h2>
+  <div class="diagram">
+<pre>
+USER
+  ↓
+LBE CLI/TUI (Rust/Ratatui OR HTML cockpit)
+  ↓
+RealLbeWrapper / PTY / ConPTY
+  ↓
+LBE Runtime (session/workspace identity)
+  ↓
+Cline Provider (reasoning/model)
+  ↓
+Authorization (LBE policy check)
+  ↓
+Governed Execution (tool registry)
+  ↓
+ToolReceipt / Evidence (persisted)
+  ↓
+Validation / Completion (LBE truth)
+  ↓
+Terminal Projection (UI renders state)
+  ↓
+Clean Exit / Resume
+</pre>
+  </div>
+
+  <h2>Correct Implementation Path</h2>
+  <ol style="margin-left: 2rem;">
+    <li>
+      <strong>Reuse visual concepts from prototype</strong><br>
+      Extract: header structure, ecosystem strip, timeline layout, [I] composer, process projection
+    </li>
+    <li>
+      <strong>Implement in canonical surface</strong><br>
+      Target: Rust/Ratatui (C:\LBE-TUI-Lab) OR HTML cockpit (C:\Agents-Memory-Tool-v6-integration)
+    </li>
+    <li>
+      <strong>Bind to real runtime via LbeWrapper</strong><br>
+      Use: RealLbeWrapper with <code>use_real_runtime = true</code>
+    </li>
+    <li>
+      <strong>Connect to Cline provider</strong><br>
+      Source: <code>C:\LBE-TUI-Lab\cline\apps\cli</code> via providers.json
+    </li>
+    <li>
+      <strong>Query BirdEye MCP for workspace state</strong><br>
+      Route: workspace/memory/skills queries via consolidated MCP endpoint
+    </li>
+    <li>
+      <strong>Prove in real TTY/ConPTY</strong><br>
+      Acceptance: Launch in actual Windows terminal, not browser
+    </li>
+  </ol>
+
+  <h2>Missing Reconciliation Document</h2>
+  <div class="warning">
+    <strong>Note:</strong> The reconciliation document <code>UPLOADED_TERMINAL_UI_PROTOTYPE_RECONCILIATION_2026-09-18.md</code> 
+    was mentioned in the verification but does not exist in the <code>lbe-plan-canvas</code> directory. This HTML document 
+    serves that purpose. If a Markdown version is needed in GPT-Knowledge, it should be created at:<br>
+    <code>C:\MCP Local\GPT-Knowledge\project-engineering\projects\lbe-plan-canvas\UPLOADED_TERMINAL_UI_PROTOTYPE_RECONCILIATION_2026-09-18.md</code>
+  </div>
+
+  <h2>Prototype File Analysis</h2>
+  <table>
+    <tr>
+      <th>File</th>
+      <th>Issue</th>
+      <th>Severity</th>
+    </tr>
+    <tr>
+      <td><code>src/lib/terminal-engine.ts</code></td>
+      <td>Hard-codes ALL state: session ID, workspace, model, provider, auth, repos, gate, topology, blockers</td>
+      <td><span class="status status-blocked">CRITICAL</span></td>
+    </tr>
+    <tr>
+      <td><code>src/App.tsx</code></td>
+      <td>Comment: "Process command with delay to simulate runtime" + Math.random() for duration</td>
+      <td><span class="status status-blocked">CRITICAL</span></td>
+    </tr>
+    <tr>
+      <td><code>src/types/terminal.ts</code></td>
+      <td>mode: 'PLAN' | 'ACT' — missing AUDIT mode</td>
+      <td><span class="status status-warning">HIGH</span></td>
+    </tr>
+    <tr>
+      <td><code>TERMINAL_UI.md</code></td>
+      <td>Claims "all state comes from authoritative runtime data" — contradicts implementation</td>
+      <td><span class="status status-warning">HIGH</span></td>
+    </tr>
+    <tr>
+      <td>No runtime transport</td>
+      <td>No fetch, WebSocket, EventSource, PTY/ConPTY, child-process bridge, or localhost endpoint</td>
+      <td><span class="status status-blocked">CRITICAL</span></td>
+    </tr>
+  </table>
+
+  <h2>Canonical Workspace References</h2>
+  <ul>
+    <li>
+      <strong>LBE-TUI-Lab</strong> (C:\LBE-TUI-Lab)<br>
+      Rust/Ratatui TUI with RealLbeWrapper, AgentMode enum (including Audit), Phase enum, MockPanel enum<br>
+      Status: REFERENCE_REUSE_INPUT_NOT_FINAL_PRODUCT_AUTHORITY
+    </li>
+    <li>
+      <strong>GPT-Knowledge</strong> (C:\MCP Local\GPT-Knowledge)<br>
+      status.json confirms: final_ui_direction = HTML_BASED_LBE_TUI_FINAL_PRODUCT_TARGET<br>
+      active_slice_constraint forbids UI redesign by current TUI P2/P3 slice
+    </li>
+    <li>
+      <strong>Agents-Memory-Tool-v6-integration</strong> (C:\Agents-Memory-Tool-v6-integration)<br>
+      Canonical backend workspace with HTML cockpit direction
+    </li>
+  </ul>
+
+  <h2>Next Steps</h2>
+  <ol style="margin-left: 2rem;">
+    <li>
+      <strong>Examine corrupted main.rs in LBE-TUI-Lab</strong><br>
+      Investigate null bytes and determine if file is recoverable
+    </li>
+    <li>
+      <strong>Analyze Rust TUI code for adaptation</strong><br>
+      Review app.rs (2374 lines), ui.rs (2558 lines), wrapper.rs (5274 lines) for reusable patterns
+    </li>
+    <li>
+      <strong>Check BirdEye memory for recorded reconciliation</strong><br>
+      Verify if reconciliation was recorded via BirdEye rather than as GPT-K file
+    </li>
+    <li>
+      <strong>Implement HTML cockpit prototype</strong><br>
+      Build canonical HTML-based LBE TUI in C:\Agents-Memory-Tool-v6-integration
+    </li>
+    <li>
+      <strong>Wire to real LBE runtime</strong><br>
+      Connect via RealLbeWrapper, Cline provider, BirdEye MCP
+    </li>
+    <li>
+      <strong>Prove in real TTY/ConPTY</strong><br>
+      Final acceptance in actual Windows terminal
+    </li>
+  </ol>
+
+  <h2>Conclusion</h2>
+  <p>
+    The uploaded React terminal UI prototype is a <strong>visual reference</strong> that correctly implements the 
+    locked September 5 contract's visual hierarchy and interaction patterns. However, it has <strong>no runtime 
+    connection</strong> and cannot be used as production code.
+  </p>
+  <p>
+    The correct path is to reuse the visual concepts and implement them in the canonical LBE product surface 
+    (Rust/Ratatui or HTML cockpit), binding to the real LBE runtime via RealLbeWrapper, Cline provider, and 
+    BirdEye MCP, then proving acceptance in a real TTY/ConPTY terminal.
+  </p>
+
+  <div class="metadata" style="margin-top: 3rem; padding-top: 1rem; border-top: 1px solid #2a2a2d;">
+    Document generated: 2026-09-18<br>
+    Classification: ARCHITECTURE RECONCILIATION<br>
+    Authority: LBE governance / GPT-Knowledge projection<br>
+    Status: <span class="status status-pass">DOCUMENTED</span>
+  </div>
+</body>
+</html>
