@@ -1,7 +1,7 @@
 import { useState } from 'react'
 
 export default function App() {
-  const [selectedView, setSelectedView] = useState<'landing' | 'react-proto' | 'cockpit' | 'reconciliation'>('landing')
+  const [selectedView, setSelectedView] = useState<'landing' | 'react-proto' | 'cockpit' | 'reconciliation' | 'cline-seam'>('landing')
 
   if (selectedView === 'react-proto') {
     return (
@@ -47,6 +47,22 @@ export default function App() {
           </button>
         </div>
         <iframe src="/reconciliation.html" className="w-full h-full border-0" title="Reconciliation Document" />
+      </div>
+    )
+  }
+
+  if (selectedView === 'cline-seam') {
+    return (
+      <div className="h-screen w-screen bg-[#0b0b0c] text-[#e1e1e6] font-mono">
+        <div className="fixed top-2 right-2 z-50">
+          <button
+            onClick={() => setSelectedView('landing')}
+            className="px-3 py-1.5 bg-[#1c1c1f] border border-[#2a2a2d] rounded text-xs text-[#8e8e93] hover:text-[#e1e1e6] transition-colors"
+          >
+            ← Back to Hub
+          </button>
+        </div>
+        <iframe src="/cline-dependency-seam.html" className="w-full h-full border-0" title="Cline Dependency Seam Analysis" />
       </div>
     )
   }
@@ -168,6 +184,45 @@ export default function App() {
               Open →
             </div>
           </button>
+
+          {/* Cline Dependency Seam Analysis */}
+          <button
+            onClick={() => setSelectedView('cline-seam')}
+            className="bg-[#141416] border border-[#2a2a2d] rounded-lg p-5 text-left hover:border-[#a855f7] transition-colors group md:col-span-2"
+          >
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-sm font-bold group-hover:text-[#a855f7]">Cline Dependency Seam Analysis</h3>
+              <span className="text-[10px] px-2 py-0.5 bg-purple-900/40 text-purple-400 rounded border border-purple-800">
+                RECOVERY/COMPOSITION
+              </span>
+            </div>
+            <p className="text-xs text-[#8e8e93] mb-3 leading-relaxed">
+              Deep analysis of the embedded Cline client dependency. Documents the pinned commit, 
+              inspected files, authority boundaries, missing modules, and recovery options for the 
+              LBE × Cline composition seam.
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-[10px] text-[#8e8e93]">
+              <div>
+                <div className="font-bold text-[#e1e1e6] mb-1">Pinned Commit</div>
+                <div className="font-mono text-[9px]">952df213ee654633...</div>
+              </div>
+              <div>
+                <div className="font-bold text-[#e1e1e6] mb-1">npm Package</div>
+                <div>@cline/agents@0.0.75</div>
+              </div>
+              <div>
+                <div className="font-bold text-[#e1e1e6] mb-1">Missing</div>
+                <div className="text-[#ff3b3b]">cline/ directory</div>
+              </div>
+              <div>
+                <div className="font-bold text-[#e1e1e6] mb-1">Recovery</div>
+                <div className="text-[#22c55e]">Option A (bounded)</div>
+              </div>
+            </div>
+            <div className="mt-3 text-[10px] text-[#a855f7]">
+              Open →
+            </div>
+          </button>
         </div>
 
         {/* Architecture flow */}
@@ -212,6 +267,11 @@ export default function App() {
               <span className="text-[#f59e0b]">▸</span>
               <code className="text-[#e1e1e6]">/reconciliation.html</code>
               <span className="text-[#8e8e93]">— Architecture reconciliation document</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <span className="text-[#a855f7]">▸</span>
+              <code className="text-[#e1e1e6]">/cline-dependency-seam.html</code>
+              <span className="text-[#8e8e93]">— Cline dependency recovery seam analysis</span>
             </div>
           </div>
         </div>

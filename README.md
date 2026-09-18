@@ -54,6 +54,28 @@ Formal architecture reconciliation between the uploaded React prototype and cano
 - Missing reconciliation document notice
 - Next steps for production implementation
 
+### 5. Cline Dependency Seam Analysis (`/cline-dependency-seam.html`)
+Deep analysis of the embedded Cline client dependency, documenting the pinned commit, inspected files, authority boundaries, missing modules, and recovery options.
+
+**Contents:**
+- Pinned Cline commit: `952df213ee654633fb3f7abda23a1c1b24e92d7f`
+- 5 runtime files inspected from `apps/cli/src/runtime/`
+- npm package `@cline/agents@0.0.75` (already installed in cline_worker)
+- Missing `cline/` directory analysis
+- Authority boundaries (LBE vs Cline vs Rust)
+- Recovery options (Option A recommended: bounded adapter)
+- Authority risks and acceptance commands
+
+**Status:**
+- Analysis complete, recovery path identified
+- Option A (bounded adapter) is smallest safe seam
+- Does not require restoring full historical Cline workspace
+- Prototype classification and limitations
+- What the prototype gets right/wrong
+- Correct implementation path
+- Missing reconciliation document notice
+- Next steps for production implementation
+
 ## 🎯 Correct Implementation Path
 
 ```
@@ -193,9 +215,10 @@ You can also open the HTML files directly:
 ```
 lbe-workspace/
 ├── public/
-│   ├── react-terminal.html    # React terminal prototype
-│   ├── cockpit.html           # HTML cockpit prototype
-│   └── reconciliation.html    # Architecture reconciliation
+│   ├── react-terminal.html         # React terminal prototype
+│   ├── cockpit.html                # HTML cockpit prototype
+│   ├── reconciliation.html         # Architecture reconciliation
+│   └── cline-dependency-seam.html  # Cline dependency analysis
 ├── src/
 │   ├── App.tsx                # Landing page
 │   ├── main.tsx               # Entry point
@@ -206,6 +229,7 @@ lbe-workspace/
 ├── tsconfig.json              # TypeScript config
 ├── tailwind.config.js         # Tailwind config
 ├── TERMINAL_UI.md             # Original documentation
+├── CLINE_DEPENDENCY_SEAM.md   # Cline dependency analysis (markdown)
 └── README.md                  # This file
 ```
 
@@ -213,7 +237,9 @@ lbe-workspace/
 
 - `TERMINAL_UI.md` - Original terminal UI documentation
 - `AUDIT_REPORT.md` - Full ecosystem audit report
+- `CLINE_DEPENDENCY_SEAM.md` - Cline dependency recovery seam analysis
 - `reconciliation.html` - Architecture reconciliation document
+- `cline-dependency-seam.html` - Interactive Cline dependency analysis
 
 ## 📝 Notes
 
