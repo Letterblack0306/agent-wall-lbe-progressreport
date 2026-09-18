@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LBE × Cline Composition Seam</title>
+<style>
+body{margin:0;background:#0b0b0c;color:#e1e1e6;font:14px/1.55 ui-monospace,SFMono-Regular,Consolas,monospace}
+main{max-width:980px;margin:auto;padding:36px}
+h1,h2{color:#fff} code,pre{background:#141416;border:1px solid #2a2a2d;border-radius:4px} pre{padding:16px;overflow:auto}
+.note{border-left:3px solid #ff3b3b;background:#141416;padding:14px;margin:20px 0}
+.muted{color:#8e8e93} table{width:100%;border-collapse:collapse}td,th{border:1px solid #2a2a2d;padding:10px;text-align:left}
+</style>
+</head>
+<body><main>
+<h1>LBE × Cline Composition Seam</h1>
+<p class="muted">Current product-owner decision · 2026-09-18 · reference/reporting page</p>
+<div class="note"><strong>Current direction:</strong> LBE owns the visible product UI. Rust/Ratatui is the canonical terminal implementation. Cline remains headless mechanics only.</div>
+<pre>PRODUCT / BRAND      = LBE / LetterBlack
+VISIBLE TERMINAL UI  = LBE-owned Rust/Ratatui
+HTML / REACT         = visual/interaction reference
+CLINE                = headless reasoning/provider/model/continuation
+LBE RUNTIME          = sole authority</pre>
+<h2>Composition</h2>
+<pre>user
+ -> lbe
+ -> Rust/Ratatui LBE shell
+ -> RealLbeWrapper / LBE boundary
+ -> headless Cline reasoning/provider mechanics
+ -> LBE authorization + governed execution
+ -> ToolReceipt / evidence
+ -> persistence / validation / completion
+ -> truthful terminal projection</pre>
+<h2>Cline dependency</h2>
+<table><tr><th>Item</th><th>Role</th></tr>
+<tr><td>@cline/agents@0.0.75 / cline_worker</td><td>Retain as headless runtime mechanics</td></tr>
+<tr><td>cline/cline @ 952df213...</td><td>Upstream provenance/reference</td></tr>
+<tr><td>Copied Cline CLI/OpenTUI tree</td><td>Not required as the visible product surface</td></tr>
+<tr><td>System-installed cline command</td><td>Not a canonical normal-user product dependency</td></tr></table>
+<h2>Current seam</h2>
+<pre>contract target
+= build target
+= package target
+= installed launcher target
+= Rust/Ratatui LBE client</pre>
+<p>HTML/React artifacts remain useful for layout and interaction. Their hard-coded/simulated data is not runtime truth. Final acceptance still requires the installed <code>lbe</code> path in a real TTY/ConPTY terminal.</p>
+</main></body></html>

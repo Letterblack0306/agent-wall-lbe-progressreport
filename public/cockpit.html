@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LBE · agents-workspace · cockpit</title>
+  <style>
+    /* ═══════════════════════════════════════════════════════════════
+       LBE HTML Cockpit — Reference Prototype
+       Letterblack Industrial Dark System
+       Locked September 5, 2026 Terminal Interaction Contract
+       
+       STATUS: VISUAL REFERENCE ONLY — NO RUNTIME CONNECTION
+       This is a structural reference for the canonical HTML cockpit.
+       Production implementation must bind to RealLbeWrapper/Cline/BirdEye.
+       ═══════════════════════════════════════════════════════════════ */
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg-primary: #0b0b0c;
+      --bg-secondary: #141416;
+      --bg-tertiary: #1c1c1f;
+      --accent-red: #ff3b3b;
+      --border: #2a2a2d;
+      --text-main: #e1e1e6;
+      --text-muted: #8e8e93;
+      --green: #22c55e;
+      --yellow: #f59e0b;
+      --blue: #3b82f6;
+      --purple: #a855f7;
+      --cyan: #06b6d4;
+    }
+
+    body {
+      font-family: 'JetBrains Mono', 'Fira Code', 'SF Mono', 'Cascadia Code', 'Consolas', monospace;
+      background: var(--bg-primary);
+      color: var(--text-main);
+      font-size: 13px;
+      line-height: 1.5;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ═══════════════════ HEADER ═══════════════════ */
+    .header {
+      flex-shrink: 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .header-primary {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 16px;
+      background: var(--bg-primary);
+    }
+
+    .header-identity {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand {
+      color: var(--accent-red);
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      font-size: 11px;
+    }
+
+    .separator { color: var(--border); }
+
+    .workspace { color: var(--text-main); }
+    .model { color: var(--text-muted); }
+    .mode { font-weight: 700; }
+    .mode-plan { color: var(--text-muted); }
+    .mode-act { color: var(--green); }
+    .mode-audit { color: var(--cyan); }
+
+    .header-meta {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .git-branch { color: var(--text-main); }
+    .git-diff { color: var(--green); }
+
+    /* Context bar */
+    .context-bar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 4px 16px;
+      background: #0f0f10;
+    }
+
+    .context-label {
+      font-size: 10px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .context-track {
+      flex: 1;
+      max-width: 200px;
+      height: 3px;
+      background: var(--bg-tertiary);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .context-fill {
+      height: 100%;
+      border-radius: 2px;
+      transition: width 0.5s ease;
+    }
+
+    .context-fill-low { background: var(--green); }
+    .context-fill-mid { background: var(--yellow); }
+    .context-fill-high { background: var(--accent-red); }
+
+    .context-value { font-size: 10px; color: var(--text-muted); }
+
+    .gate-status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 10px;
+    }
+
+    .gate-label { color: var(--text-muted); }
+    .gate-open { color: var(--yellow); font-weight: 700; }
+    .gate-blocked { color: var(--accent-red); font-weight: 700; }
+    .gate-pass { color: var(--green); font-weight: 700; }
+
+    /* Ecosystem strip */
+    .ecosystem-strip {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 4px 16px;
+      background: var(--bg-primary);
+      border-top: 1px solid var(--bg-tertiary);
+      overflow-x: auto;
+    }
+
+    .repo-indicator {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+
+    .repo-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+    }
+
+    .repo-dot-healthy { background: var(--green); }
+    .repo-dot-blocked { background: var(--accent-red); }
+    .repo-dot-progress { background: var(--yellow); }
+
+    .repo-name { font-size: 10px; color: var(--text-muted); }
+    .repo-ci { font-size: 10px; }
+    .repo-ci-pass { color: var(--green); }
+    .repo-ci-fail { color: var(--accent-red); }
+    .repo-ci-na { color: var(--text-muted); }
+
+    .mcp-metric {
+      font-size: 10px;
+      color: var(--text-muted);
+      margin-left: auto;
+    }
+
+    .mcp-pass { color: var(--blue); }
+    .mcp-fail { color: var(--accent-red); }
+
+    /* ═══════════════════ MAIN CONTENT ═══════════════════ */
+    .main-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px 16px;
+    }
+
+    .section {
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--bg-tertiary);
+    }
+
+    .section-label {
+      font-size: 10px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 4px;
+    }
+
+    .section-value {
+      font-size: 12px;
+      color: var(--text-main);
+    }
+
+    .section-detail {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .blocked-reason {
+      font-size: 11px;
+      color: rgba(255, 59, 59, 0.8);
+      margin-top: 2px;
+    }
+
+    .timeline-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .timeline-line {
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .timeline-label {
+      font-size: 10px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .timeline-entry {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      padding: 4px;
+      margin-bottom: 4px;
+      border-radius: 2px;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .timeline-entry:hover {
+      background: var(--bg-secondary);
+    }
+
+    .entry-status {
+      flex-shrink: 0;
+      font-size: 12px;
+    }
+
+    .entry-status-pass { color: var(--green); }
+    .entry-status-fail { color: var(--accent-red); }
+
+    .entry-type {
+      font-size: 10px;
+      text-transform: uppercase;
+      flex-shrink: 0;
+    }
+
+    .type-inspect { color: var(--blue); }
+    .type-audit { color: var(--purple); }
+    .type-gate { color: var(--yellow); }
+    .type-query { color: var(--cyan); }
+    .type-system { color: var(--text-muted); }
+
+    .entry-summary {
+      flex: 1;
+      color: var(--text-main);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .entry-duration {
+      font-size: 10px;
+      color: var(--text-muted);
+      flex-shrink: 0;
+    }
+
+    .entry-expand {
+      font-size: 10px;
+      color: var(--text-muted);
+      flex-shrink: 0;
+    }
+
+    .entry-detail {
+      margin-left: 20px;
+      margin-top: 4px;
+      margin-bottom: 8px;
+      padding-left: 12px;
+      border-left: 1px solid var(--border);
+    }
+
+    .entry-detail-line {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-bottom: 2px;
+    }
+
+    /* ═══════════════════ ACTIVE PROCESS ═══════════════════ */
+    .active-process {
+      flex-shrink: 0;
+      border-top: 1px solid var(--border);
+      padding: 8px 16px;
+      background: #0f0f10;
+    }
+
+    .active-label {
+      font-size: 10px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 4px;
+    }
+
+    .active-event {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      margin-bottom: 2px;
+    }
+
+    .pulse-dots {
+      display: inline-flex;
+      gap: 2px;
+    }
+
+    .pulse-dot {
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: var(--accent-red);
+      animation: pulse 1.2s infinite;
+    }
+
+    .pulse-dot:nth-child(2) { animation-delay: 0.2s; }
+    .pulse-dot:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.3; }
+      50% { opacity: 1; }
+    }
+
+    /* ═══════════════════ COMPOSER ═══════════════════ */
+    .composer {
+      flex-shrink: 0;
+      border-top: 1px solid var(--border);
+    }
+
+    .composer-input {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+    }
+
+    .composer-identity {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-muted);
+      flex-shrink: 0;
+    }
+
+    .composer-identity-active {
+      color: var(--accent-red);
+    }
+
+    .composer-field {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--text-main);
+      font-family: inherit;
+      font-size: 13px;
+      caret-color: var(--accent-red);
+    }
+
+    .composer-field::placeholder {
+      color: rgba(142, 142, 147, 0.5);
+    }
+
+    .composer-field:disabled {
+      opacity: 0.5;
+    }
+
+    .composer-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 4px 16px;
+      background: #0f0f10;
+      border-top: 1px solid var(--bg-tertiary);
+      font-size: 10px;
+      color: var(--text-muted);
+    }
+
+    .footer-meta {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    /* ═══════════════════ REFERENCE NOTICE ═══════════════════ */
+    .reference-notice {
+      position: fixed;
+      bottom: 40px;
+      right: 16px;
+      background: rgba(245, 158, 11, 0.1);
+      border: 1px solid var(--yellow);
+      border-radius: 4px;
+      padding: 8px 12px;
+      font-size: 10px;
+      color: var(--yellow);
+      max-width: 280px;
+      z-index: 100;
+    }
+
+    .reference-notice strong {
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg-primary); }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+  </style>
+</head>
+<body>
+  <!-- ═══════════════════ HEADER ═══════════════════ -->
+  <div class="header">
+    <!-- Primary identity bar -->
+    <div class="header-primary">
+      <div class="header-identity">
+        <span class="brand">LBE</span>
+        <span class="separator">·</span>
+        <span class="workspace">agents-workspace</span>
+        <span class="separator">·</span>
+        <span class="model">claude-sonnet-4</span>
+        <span class="separator">·</span>
+        <span class="mode mode-plan">PLAN</span>
+      </div>
+      <div class="header-meta">
+        <span>git <span class="git-branch">main</span></span>
+        <span class="separator">·</span>
+        <span class="git-diff">+4 -2</span>
+      </div>
+    </div>
+
+    <!-- Context bar -->
+    <div class="context-bar">
+      <span class="context-label">ctx</span>
+      <div class="context-track">
+        <div class="context-fill context-fill-mid" style="width: 67%"></div>
+      </div>
+      <span class="context-value">67%</span>
+      <div class="gate-status">
+        <span class="gate-label">gate:</span>
+        <span class="gate-open">OPEN</span>
+        <span class="separator">|</span>
+        <span class="gate-label">provider:</span>
+        <span style="color: var(--green)">connected</span>
+      </div>
+    </div>
+
+    <!-- Ecosystem strip -->
+    <div class="ecosystem-strip">
+      <div class="repo-indicator">
+        <div class="repo-dot repo-dot-blocked"></div>
+        <span class="repo-name">LBE-Backend</span>
+        <span class="repo-ci repo-ci-fail">✗</span>
+      </div>
+      <div class="repo-indicator">
+        <div class="repo-dot repo-dot-progress"></div>
+        <span class="repo-name">LBE-Frontend</span>
+        <span class="repo-ci repo-ci-na">—</span>
+      </div>
+      <div class="repo-indicator">
+        <div class="repo-dot repo-dot-healthy"></div>
+        <span class="repo-name">GPT-K</span>
+        <span class="repo-ci repo-ci-pass">✓</span>
+      </div>
+      <div class="repo-indicator">
+        <div class="repo-dot repo-dot-healthy"></div>
+        <span class="repo-name">BirdEye</span>
+        <span class="repo-ci repo-ci-pass">✓</span>
+      </div>
+      <span class="separator">|</span>
+      <span class="mcp-metric">
+        MCP: <span class="mcp-pass">53P</span><span class="separator">/</span><span class="mcp-fail">0F</span>
+      </span>
+    </div>
+  </div>
+
+  <!-- ═══════════════════ MAIN CONTENT ═══════════════════ -->
+  <div class="main-content">
+    <!-- Session block -->
+    <div class="section">
+      <div class="section-label">session</div>
+      <div class="section-value">lbe-session-a8f3c2d1</div>
+      <div class="section-detail">workspace-root verified · provider: claude-sonnet-4 · connected</div>
+    </div>
+
+    <!-- Gate state -->
+    <div class="section">
+      <div class="section-label">machine gate</div>
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <span class="gate-open">OPEN</span>
+        <span class="separator">·</span>
+        <span class="section-value">FINAL_PRODUCT_SOURCE_RECONCILIATION</span>
+      </div>
+      <div class="blocked-reason">blocked: Textual TUI PREVIEW/synthetic vs Cline path not reconciled</div>
+    </div>
+
+    <!-- Timeline header -->
+    <div class="timeline-header">
+      <div class="timeline-line"></div>
+      <span class="timeline-label">execution timeline · 3</span>
+      <div class="timeline-line"></div>
+    </div>
+
+    <!-- Timeline entries -->
+    <div class="timeline-entry" onclick="toggleDetail('entry1')">
+      <span class="entry-status entry-status-pass">✓</span>
+      <span class="entry-type type-audit">audit</span>
+      <span class="entry-summary">audit.completed · 6/8 layers aligned</span>
+      <span class="entry-duration">180ms</span>
+      <span class="entry-expand">▸</span>
+    </div>
+    <div id="entry1" class="entry-detail" style="display: none;">
+      <div class="entry-detail-line">> audit</div>
+      <div class="entry-detail-line">architecture compliance audit:</div>
+      <div class="entry-detail-line">  layers aligned: 6/8</div>
+      <div class="entry-detail-line">  repos healthy: 3/4</div>
+      <div class="entry-detail-line">  ✓ Authority Separation</div>
+      <div class="entry-detail-line">  ✓ Backend Runtime — 767 tests PASS</div>
+      <div class="entry-detail-line">  ✗ CI/CD Pipeline — 7+ consecutive failures</div>
+      <div class="entry-detail-line">  ✗ Structural LBE UI — Sep 5 contract not implemented</div>
+    </div>
+
+    <div class="timeline-entry" onclick="toggleDetail('entry2')">
+      <span class="entry-status entry-status-pass">✓</span>
+      <span class="entry-type type-inspect">inspect</span>
+      <span class="entry-summary">inspect.completed · LBE-Backend</span>
+      <span class="entry-duration">95ms</span>
+      <span class="entry-expand">▸</span>
+    </div>
+    <div id="entry2" class="entry-detail" style="display: none;">
+      <div class="entry-detail-line">> inspect LBE-Backend</div>
+      <div class="entry-detail-line">inspect: LBE_Presistent_Agent_wall</div>
+      <div class="entry-detail-line">role: Backend Governance Runtime</div>
+      <div class="entry-detail-line">commits: 880 · branches: 77</div>
+      <div class="entry-detail-line">ci: FAIL · gate: BLOCKED</div>
+      <div class="entry-detail-line">runtime: 767 tests PASS · all core capabilities PROVEN</div>
+    </div>
+
+    <div class="timeline-entry" onclick="toggleDetail('entry3')">
+      <span class="entry-status entry-status-pass">✓</span>
+      <span class="entry-type type-system">system</span>
+      <span class="entry-summary">status.displayed</span>
+      <span class="entry-duration">42ms</span>
+      <span class="entry-expand">▸</span>
+    </div>
+    <div id="entry3" class="entry-detail" style="display: none;">
+      <div class="entry-detail-line">> status</div>
+      <div class="entry-detail-line">session: lbe-session-a8f3c2d1</div>
+      <div class="entry-detail-line">workspace: agents-workspace</div>
+      <div class="entry-detail-line">provider: claude-sonnet-4 · connected</div>
+      <div class="entry-detail-line">mode: PLAN · context: 67%</div>
+      <div class="entry-detail-line">gate: OPEN · FINAL_PRODUCT_SOURCE_RECONCILIATION</div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════ COMPOSER ═══════════════════ -->
+  <div class="composer">
+    <div class="composer-input">
+      <span class="composer-identity">[I]</span>
+      <input 
+        type="text" 
+        class="composer-field" 
+        placeholder="Message LBE..."
+        spellcheck="false"
+        autocomplete="off"
+      >
+    </div>
+    <div class="composer-footer">
+      <div class="footer-meta">
+        <span>ctx <span style="color: var(--text-main)">67%</span></span>
+        <span class="separator">·</span>
+        <span class="mode-plan">PLAN</span>
+        <span class="separator">·</span>
+        <span>type <span style="color: var(--text-main)">help</span> for commands</span>
+      </div>
+      <span>Ctrl+K clear</span>
+    </div>
+  </div>
+
+  <!-- Reference notice -->
+  <div class="reference-notice">
+    <strong>⚠ VISUAL REFERENCE ONLY</strong>
+    This HTML cockpit is a structural prototype. No runtime connection. 
+    Production must bind to RealLbeWrapper / Cline / BirdEye MCP.
+    See: reconciliation.html
+  </div>
+
+  <script>
+    function toggleDetail(id) {
+      const el = document.getElementById(id);
+      const entry = el.previousElementSibling;
+      const expand = entry.querySelector('.entry-expand');
+      
+      if (el.style.display === 'none') {
+        el.style.display = 'block';
+        expand.textContent = '▾';
+      } else {
+        el.style.display = 'none';
+        expand.textContent = '▸';
+      }
+    }
+
+    // Focus input on click
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.reference-notice')) {
+        document.querySelector('.composer-field').focus();
+      }
+    });
+
+    // Handle Enter key
+    document.querySelector('.composer-field').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        const value = e.target.value.trim();
+        if (value) {
+          console.log('Command:', value);
+          e.target.value = '';
+          // In production, this would send to RealLbeWrapper
+        }
+      }
+    });
+  </script>
+</body>
+</html>
