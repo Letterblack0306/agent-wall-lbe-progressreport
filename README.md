@@ -31,7 +31,7 @@ Interactive terminal UI built with React + TypeScript + Tailwind CSS.
 - Uses `Math.random()` for simulated delays
 
 ### 3. HTML Cockpit (`/cockpit.html`)
-Single-file HTML prototype following the canonical HTML-based LBE TUI direction.
+Single-file HTML prototype retained as an LBE visual/interaction reference.
 
 **Features:**
 - Pure HTML/CSS/JS (no framework dependency)
@@ -41,8 +41,8 @@ Single-file HTML prototype following the canonical HTML-based LBE TUI direction.
 - Self-contained (can be deployed anywhere)
 
 **Status:**
-- Closer to production target than React prototype
-- Still requires runtime binding for production use
+- Useful visual/interaction reference for the selected Rust/Ratatui client
+- Not a selected runtime technology and not runtime proof
 
 ### 4. Reconciliation Document (`/reconciliation.html`)
 Formal architecture reconciliation between the uploaded React prototype and canonical LBE workspace.
@@ -63,7 +63,7 @@ Deep analysis of the embedded Cline client dependency, documenting the pinned co
 - npm package `@cline/agents@0.0.75` (already installed in cline_worker)
 - Missing `cline/` directory analysis
 - Authority boundaries (LBE vs Cline vs Rust)
-- Recovery options (Option A recommended: bounded adapter)
+- Historical recovery analysis; visible Cline UI recovery is superseded by the Rust/Ratatui product decision
 - Authority risks and acceptance commands
 
 **Status:**
@@ -101,9 +101,11 @@ Visual Reference (this workspace)
     ↓
 Reuse visual hierarchy / interaction concepts
     ↓
-Implement in LBE CLI/TUI surface (Rust/Ratatui or HTML cockpit)
+Implement in the selected LBE-owned Rust/Ratatui client
     ↓
-Bind to REAL LBE/Cline emitted state via LbeWrapper/RealLbeWrapper
+Bind to REAL LBE runtime state via LbeWrapper/RealLbeWrapper
+    ↓
+Use Cline headlessly for reasoning/provider/model continuation
     ↓
 Real TTY/ConPTY acceptance
 ```
@@ -207,23 +209,21 @@ You can also open the HTML files directly:
 | GPT-Knowledge | 821 | 10 | PASS | ACTIVE | ✅ |
 | BirdEye | 48 | 5 | PASS | STABLE | ✅ |
 
-**MCP Topology:** 53 PASS / 0 FAIL
+**MCP Topology:** historical/reference figure only; re-verify before current claims
 
 ## 🎯 Next Steps for Production
 
-1. **Fix CI/CD Pipeline** (LOW effort)
+1. **Reconcile the canonical Rust product build/package/launcher owner**
    - Check validate workflow logs #616-622
    - 7+ consecutive failures on main
 
-2. **Implement Structural LBE Shell** (HIGH effort)
-   - Build Sep 5 locked contract in Cline CLI
-   - Header + timeline + context bar + [I] composer
+2. **Implement/complete the locked LBE shell in Rust/Ratatui**
+   - Reuse the existing HTML/React visual contract
+   - Header + timeline + context bar + [I] composer using real state
 
-3. **Fix Session Mode** (LOW effort)
-   - Change `lbe-cli.ps1` from audit to coding
+3. **Reconcile PLAN/ACT/AUDIT with backend mode/policy/permission owners**
 
-4. **Remove Binary from Git** (LOW effort)
-   - Add `lbe.exe` to `.gitignore`
+4. **Keep Cline headless and remove visible/system Cline UI dependency from the normal product path**
 
 5. **Prove End-to-End Path** (MEDIUM effort)
    - Session → provider → tool → receipt → evidence → completion → TUI projection

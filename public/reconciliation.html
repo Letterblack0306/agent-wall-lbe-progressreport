@@ -55,7 +55,7 @@
     <strong>⚠ Critical Distinction:</strong><br>
     The React prototype has <strong>NO runtime transport</strong>. All state is hard-coded. It cannot connect to 
     the actual LBE runtime, Cline provider, or BirdEye MCP. It is a visual reference for implementing the locked 
-    September 5 contract in the actual product surface (Rust/Ratatui or HTML cockpit).
+    September 5 contract in the selected LBE-owned Rust/Ratatui product surface.
   </div>
 
   <h2>Prototype Classification</h2>
@@ -68,12 +68,12 @@
     <tr>
       <td>Technology</td>
       <td>React + TypeScript + Tailwind</td>
-      <td>Rust/Ratatui OR HTML cockpit</td>
+      <td>LBE-owned Rust/Ratatui</td>
     </tr>
     <tr>
       <td>Runtime Connection</td>
       <td><span class="status status-blocked">NONE</span> — Hard-coded state</td>
-      <td>RealLbeWrapper / PTY / ConPTY</td>
+      <td>RealLbeWrapper / LBE runtime boundary / PTY / ConPTY</td>
     </tr>
     <tr>
       <td>State Source</td>
@@ -127,7 +127,7 @@
 <pre>
 USER
   ↓
-LBE CLI/TUI (Rust/Ratatui OR HTML cockpit)
+LBE-owned Rust/Ratatui CLI/TUI
   ↓
 RealLbeWrapper / PTY / ConPTY
   ↓
@@ -157,7 +157,7 @@ Clean Exit / Resume
     </li>
     <li>
       <strong>Implement in canonical surface</strong><br>
-      Target: Rust/Ratatui (C:\LBE-TUI-Lab) OR HTML cockpit (C:\Agents-Memory-Tool-v6-integration)
+      Target: Rust/Ratatui in C:\LBE-TUI-Lab; use HTML/React only as visual/interaction reference
     </li>
     <li>
       <strong>Bind to real runtime via LbeWrapper</strong><br>
@@ -228,12 +228,12 @@ Clean Exit / Resume
     </li>
     <li>
       <strong>GPT-Knowledge</strong> (C:\MCP Local\GPT-Knowledge)<br>
-      status.json confirms: final_ui_direction = HTML_BASED_LBE_TUI_FINAL_PRODUCT_TARGET<br>
+      Current canonical GPT-K selects the LBE-owned Rust/Ratatui client; older local HTML-only projections are stale<br>
       active_slice_constraint forbids UI redesign by current TUI P2/P3 slice
     </li>
     <li>
       <strong>Agents-Memory-Tool-v6-integration</strong> (C:\Agents-Memory-Tool-v6-integration)<br>
-      Canonical backend workspace with HTML cockpit direction
+      Canonical backend runtime authority; HTML/React remains visual reference only
     </li>
   </ul>
 
@@ -252,8 +252,8 @@ Clean Exit / Resume
       Verify if reconciliation was recorded via BirdEye rather than as GPT-K file
     </li>
     <li>
-      <strong>Implement HTML cockpit prototype</strong><br>
-      Build canonical HTML-based LBE TUI in C:\Agents-Memory-Tool-v6-integration
+      <strong>Implement/finish the Rust/Ratatui LBE product client</strong><br>
+      Reuse the HTML/React cockpit only as visual/interaction reference
     </li>
     <li>
       <strong>Wire to real LBE runtime</strong><br>
@@ -272,9 +272,7 @@ Clean Exit / Resume
     connection</strong> and cannot be used as production code.
   </p>
   <p>
-    The correct path is to reuse the visual concepts and implement them in the canonical LBE product surface 
-    (Rust/Ratatui or HTML cockpit), binding to the real LBE runtime via RealLbeWrapper, Cline provider, and 
-    BirdEye MCP, then proving acceptance in a real TTY/ConPTY terminal.
+    The correct path is to reuse the visual concepts in the selected LBE-owned Rust/Ratatui client, bind it to the real LBE runtime through RealLbeWrapper, use Cline headlessly for reasoning/provider mechanics, and prove acceptance in a real TTY/ConPTY terminal.
   </p>
 
   <div class="metadata" style="margin-top: 3rem; padding-top: 1rem; border-top: 1px solid #2a2a2d;">

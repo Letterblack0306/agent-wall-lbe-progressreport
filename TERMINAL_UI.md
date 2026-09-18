@@ -1,6 +1,6 @@
 # LBE Terminal UI — Lockstep Boundary Engine
 
-A production-grade terminal interface implementing the **locked September 5, 2026 contract** for the Lockstep Boundary Engine workspace.
+A **visual/reference terminal specification** for the locked September 5, 2026 LBE interaction contract. The selected runtime implementation is the LBE-owned Rust/Ratatui client; this document is not runtime proof.
 
 ## Architecture Compliance
 
@@ -54,15 +54,13 @@ Exact color palette from GPT-Knowledge:
 - Main text: `#e1e1e6`
 - Muted text: `#8e8e93`
 
-### ✅ State-Truth Requirements
+### State-truth requirements for the real product
 
-All state comes from authoritative runtime data:
-- No simulated loading bars
-- No synthetic progress indicators
-- Context bar reflects actual model context usage
-- Gate status reflects real machine state
-- Provider status reflects actual connection
-- Repository status reflects live CI/gate state
+The selected Rust/Ratatui product must obtain these values from authoritative runtime state. The reference artifacts in this report repository do **not** prove that binding:
+- no simulated loading bars in the real product;
+- no synthetic progress indicators;
+- context bar must reflect actual model context usage;
+- gate/provider/repository status must be re-verified before display.
 
 ## Available Commands
 
@@ -231,8 +229,8 @@ The UI projects the actual LBE workspace state from the 4-repository ecosystem:
 
 ✅ **Implements locked September 5 contract**  
 ✅ **Uses Letterblack Industrial Dark system**  
-✅ **Projects authoritative runtime state**  
-✅ **No simulation or synthetic data**  
+⚠ **Reference specification only — authoritative runtime binding is not proven here**  
+⚠ **Any simulated/static data in report artifacts remains non-authoritative**  
 ✅ **State-truth requirements enforced**  
 ✅ **Visual hierarchy correct**  
 ✅ **Context bar reflects real usage**  
@@ -245,8 +243,8 @@ The UI projects the actual LBE workspace state from the 4-repository ecosystem:
 To close the final product acceptance gate:
 
 1. Fix CI/CD pipeline (7+ consecutive failures)
-2. Implement this structural shell in the actual Cline CLI
-3. Wire to real LBE runtime (not simulated state)
+2. Implement/finish this structural shell in the selected Rust/Ratatui LBE client
+3. Bind it to the real LBE runtime and headless Cline mechanics (not simulated state)
 4. Prove end-to-end path with real receipts/evidence
 5. Close FINAL_PRODUCT_SOURCE_RECONCILIATION gate
 
