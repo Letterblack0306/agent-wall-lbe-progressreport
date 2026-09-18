@@ -90,7 +90,7 @@ export default function App() {
               <p className="text-xs text-[#8e8e93] leading-relaxed">
                 All artifacts in this workspace are <strong className="text-[#e1e1e6]">reference prototypes</strong> with 
                 hard-coded state. They have <strong className="text-[#e1e1e6]">NO runtime connection</strong> to the actual 
-                LBE runtime, Cline provider, or BirdEye MCP. Production implementation must bind to RealLbeWrapper 
+                LBE runtime, Cline provider, or BirdEye MCP. Production implementation must bind to LBE Runtime Boundary 
                 and prove acceptance in a real TTY/ConPTY terminal.
               </p>
             </div>
@@ -133,12 +133,11 @@ export default function App() {
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-sm font-bold group-hover:text-[#22c55e]">HTML Cockpit Prototype</h3>
               <span className="text-[10px] px-2 py-0.5 bg-green-900/40 text-green-400 rounded border border-green-800">
-                CANONICAL DIRECTION
+                REFERENCE
               </span>
             </div>
             <p className="text-xs text-[#8e8e93] mb-3 leading-relaxed">
-              Single-file HTML cockpit following the canonical HTML-based LBE TUI direction. 
-              Closer to the production target than the React prototype.
+              Single-file HTML cockpit retained as a visual/interaction reference for the selected Rust/Ratatui LBE client.
             </p>
             <div className="text-[10px] text-[#8e8e93] space-y-1">
               <div>• Pure HTML/CSS/JS (no framework)</div>
@@ -173,7 +172,7 @@ export default function App() {
               </div>
               <div>
                 <div className="font-bold text-[#e1e1e6] mb-1">Canonical Direction</div>
-                <div>HTML_BASED_LBE_TUI_FINAL_PRODUCT_TARGET</div>
+                <div>LBE_OWNED_RUST_RATATUI_PRODUCT_TARGET</div>
               </div>
               <div>
                 <div className="font-bold text-[#e1e1e6] mb-1">Production Target</div>
@@ -234,11 +233,11 @@ export default function App() {
               { label: '→', color: 'text-[#8e8e93]' },
               { label: 'Reuse Concepts', color: 'bg-blue-900/30 text-blue-400 border-blue-800' },
               { label: '→', color: 'text-[#8e8e93]' },
-              { label: 'HTML Cockpit / Rust TUI', color: 'bg-green-900/30 text-green-400 border-green-800' },
+              { label: 'Rust/Ratatui LBE Client', color: 'bg-green-900/30 text-green-400 border-green-800' },
               { label: '→', color: 'text-[#8e8e93]' },
               { label: 'RealLbeWrapper', color: 'bg-purple-900/30 text-purple-400 border-purple-800' },
               { label: '→', color: 'text-[#8e8e93]' },
-              { label: 'Cline Provider', color: 'bg-cyan-900/30 text-cyan-400 border-cyan-800' },
+              { label: 'Headless Cline Mechanics', color: 'bg-cyan-900/30 text-cyan-400 border-cyan-800' },
               { label: '→', color: 'text-[#8e8e93]' },
               { label: 'Real TTY/ConPTY', color: 'bg-red-900/30 text-red-400 border-red-800' },
             ].map((step, i) => (
@@ -261,7 +260,7 @@ export default function App() {
             <div className="flex items-center gap-3">
               <span className="text-[#22c55e]">▸</span>
               <code className="text-[#e1e1e6]">/cockpit.html</code>
-              <span className="text-[#8e8e93]">— HTML cockpit (canonical direction)</span>
+              <span className="text-[#8e8e93]">— HTML cockpit (visual reference)</span>
             </div>
             <div className="flex items-center gap-3">
               <span className="text-[#f59e0b]">▸</span>
