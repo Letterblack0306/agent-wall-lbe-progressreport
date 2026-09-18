@@ -70,6 +70,24 @@ Deep analysis of the embedded Cline client dependency, documenting the pinned co
 - Analysis complete, recovery path identified
 - Option A (bounded adapter) is smallest safe seam
 - Does not require restoring full historical Cline workspace
+
+### 6. Dual-Agent Governance Pattern (`/governance-subagent.html`)
+Architecture pattern specification for running a coding agent and governance subagent in parallel. The coding agent focuses on implementation while the governance subagent maintains documentation, tracks intent, manages gate state, and catches contradictions.
+
+**Contents:**
+- Problem statement: coding agents forget governance documentation
+- Dual-agent architecture visualization
+- Interaction protocol (pre-mutation, implementation, post-mutation)
+- Hard rules (non-negotiable governance constraints)
+- Governance artifacts maintained by subagent
+- Implementation pattern with code example
+- Connection to current LBE blockers
+- Next steps for implementation
+
+**Status:**
+- Pattern specified and ready for implementation
+- Solves the documentation drift problem
+- Can be implemented as separate Cline session, Python script, or BirdEye MCP tool
 - Prototype classification and limitations
 - What the prototype gets right/wrong
 - Correct implementation path
@@ -218,7 +236,8 @@ lbe-workspace/
 │   ├── react-terminal.html         # React terminal prototype
 │   ├── cockpit.html                # HTML cockpit prototype
 │   ├── reconciliation.html         # Architecture reconciliation
-│   └── cline-dependency-seam.html  # Cline dependency analysis
+│   ├── cline-dependency-seam.html  # Cline dependency analysis
+│   └── governance-subagent.html    # Dual-agent governance pattern
 ├── src/
 │   ├── App.tsx                # Landing page
 │   ├── main.tsx               # Entry point
@@ -230,6 +249,7 @@ lbe-workspace/
 ├── tailwind.config.js         # Tailwind config
 ├── TERMINAL_UI.md             # Original documentation
 ├── CLINE_DEPENDENCY_SEAM.md   # Cline dependency analysis (markdown)
+├── GOVERNANCE_SUBAGENT.md     # Dual-agent governance pattern (markdown)
 └── README.md                  # This file
 ```
 
@@ -238,8 +258,10 @@ lbe-workspace/
 - `TERMINAL_UI.md` - Original terminal UI documentation
 - `AUDIT_REPORT.md` - Full ecosystem audit report
 - `CLINE_DEPENDENCY_SEAM.md` - Cline dependency recovery seam analysis
+- `GOVERNANCE_SUBAGENT.md` - Dual-agent governance pattern specification
 - `reconciliation.html` - Architecture reconciliation document
 - `cline-dependency-seam.html` - Interactive Cline dependency analysis
+- `governance-subagent.html` - Interactive dual-agent governance pattern
 
 ## 📝 Notes
 

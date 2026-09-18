@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LBE Dual-Agent Governance Pattern — Coding + Governance Subagent</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+      background: #0b0b0c;
+      color: #e1e1e6;
+      line-height: 1.6;
+      padding: 2rem;
+      max-width: 1400px;
+      margin: 0 auto;
+      font-size: 13px;
+    }
+    h1 { color: #ff3b3b; font-size: 1.5rem; margin-bottom: 0.5rem; }
+    h2 { color: #e1e1e6; font-size: 1.2rem; margin: 2rem 0 1rem; border-bottom: 1px solid #2a2a2d; padding-bottom: 0.5rem; }
+    h3 { color: #8e8e93; font-size: 1rem; margin: 1.5rem 0 0.5rem; }
+    .metadata { color: #8e8e93; font-size: 0.85rem; margin-bottom: 2rem; }
+    .status { display: inline-block; padding: 0.25rem 0.75rem; border-radius: 3px; font-size: 0.85rem; font-weight: bold; }
+    .status-active { background: rgba(34, 197, 94, 0.2); color: #22c55e; border: 1px solid #22c55e; }
+    .status-pattern { background: rgba(168, 85, 247, 0.2); color: #a855f7; border: 1px solid #a855f7; }
+    .status-required { background: rgba(255, 59, 59, 0.2); color: #ff3b3b; border: 1px solid #ff3b3b; }
+    code { background: #1c1c1f; padding: 0.15rem 0.4rem; border-radius: 2px; color: #ff3b3b; font-size: 0.9em; }
+    .warning { background: rgba(245, 158, 11, 0.1); border-left: 3px solid #f59e0b; padding: 1rem; margin: 1rem 0; }
+    .critical { background: rgba(255, 59, 59, 0.1); border-left: 3px solid #ff3b3b; padding: 1rem; margin: 1rem 0; }
+    .success { background: rgba(34, 197, 94, 0.1); border-left: 3px solid #22c55e; padding: 1rem; margin: 1rem 0; }
+    .info { background: rgba(59, 130, 246, 0.1); border-left: 3px solid #3b82f6; padding: 1rem; margin: 1rem 0; }
+    ul { margin-left: 2rem; }
+    li { margin: 0.5rem 0; }
+    pre { background: #0f0f10; padding: 1rem; border-radius: 4px; overflow-x: auto; font-size: 0.85rem; line-height: 1.5; border: 1px solid #2a2a2d; }
+
+    /* Dual Agent Visualization */
+    .dual-agent-container {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 1rem;
+      margin: 2rem 0;
+      align-items: start;
+    }
+    .agent-panel {
+      background: #141416;
+      border: 1px solid #2a2a2d;
+      border-radius: 6px;
+      overflow: hidden;
+    }
+    .agent-header {
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid #2a2a2d;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .agent-header.coding { background: rgba(59, 130, 246, 0.1); border-bottom-color: #3b82f6; }
+    .agent-header.governance { background: rgba(168, 85, 247, 0.1); border-bottom-color: #a855f7; }
+    .agent-title { font-weight: bold; font-size: 0.9rem; }
+    .agent-title.coding { color: #3b82f6; }
+    .agent-title.governance { color: #a855f7; }
+    .agent-badge { font-size: 0.7rem; padding: 0.2rem 0.5rem; border-radius: 3px; }
+    .agent-badge.coding { background: rgba(59, 130, 246, 0.2); color: #3b82f6; }
+    .agent-badge.governance { background: rgba(168, 85, 247, 0.2); color: #a855f7; }
+    .agent-body { padding: 1rem; }
+    .agent-section { margin-bottom: 1rem; }
+    .agent-section:last-child { margin-bottom: 0; }
+    .agent-section-title { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: #8e8e93; margin-bottom: 0.5rem; }
+    .agent-task { font-size: 0.85rem; padding: 0.4rem 0.6rem; background: #0f0f10; border-radius: 3px; margin-bottom: 0.3rem; border-left: 2px solid #2a2a2d; }
+    .agent-task.active { border-left-color: #22c55e; }
+    .agent-task.pending { border-left-color: #f59e0b; }
+
+    /* Communication bridge */
+    .bridge {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem 0;
+      min-width: 120px;
+    }
+    .bridge-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em; color: #8e8e93; margin-bottom: 0.5rem; }
+    .bridge-arrow { color: #8e8e93; font-size: 1.2rem; margin: 0.3rem 0; }
+    .bridge-message { font-size: 0.7rem; color: #8e8e93; text-align: center; padding: 0.3rem 0.5rem; background: #1c1c1f; border-radius: 3px; margin: 0.2rem 0; max-width: 110px; }
+
+    /* Timeline */
+    .timeline { margin: 2rem 0; }
+    .timeline-entry {
+      display: grid;
+      grid-template-columns: 120px 30px 1fr;
+      gap: 0.75rem;
+      margin-bottom: 0.5rem;
+      align-items: start;
+    }
+    .timeline-time { font-size: 0.75rem; color: #8e8e93; text-align: right; padding-top: 0.3rem; }
+    .timeline-dot { display: flex; flex-direction: column; align-items: center; }
+    .timeline-dot .dot { width: 10px; height: 10px; border-radius: 50%; }
+    .timeline-dot .dot.coding { background: #3b82f6; }
+    .timeline-dot .dot.governance { background: #a855f7; }
+    .timeline-dot .dot.sync { background: #22c55e; }
+    .timeline-dot .line { width: 1px; flex: 1; background: #2a2a2d; min-height: 20px; }
+    .timeline-content { font-size: 0.85rem; padding: 0.4rem 0.6rem; background: #141416; border-radius: 3px; border: 1px solid #2a2a2d; }
+    .timeline-content .agent-tag { font-size: 0.7rem; padding: 0.1rem 0.4rem; border-radius: 2px; margin-right: 0.5rem; }
+    .timeline-content .agent-tag.coding { background: rgba(59, 130, 246, 0.2); color: #3b82f6; }
+    .timeline-content .agent-tag.governance { background: rgba(168, 85, 247, 0.2); color: #a855f7; }
+
+    /* Governance artifacts table */
+    table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.85rem; }
+    th, td { text-align: left; padding: 0.6rem; border: 1px solid #2a2a2d; }
+    th { background: #141416; color: #8e8e93; font-weight: normal; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.05em; }
+    td { background: #0f0f10; }
+
+    /* Rules */
+    .rule-card { background: #141416; border: 1px solid #2a2a2d; border-radius: 4px; padding: 1rem; margin-bottom: 0.75rem; }
+    .rule-card.critical { border-left: 3px solid #ff3b3b; }
+    .rule-card.important { border-left: 3px solid #f59e0b; }
+    .rule-card.standard { border-left: 3px solid #3b82f6; }
+    .rule-title { font-weight: bold; margin-bottom: 0.3rem; }
+    .rule-desc { font-size: 0.85rem; color: #8e8e93; }
+
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .card { background: #141416; border: 1px solid #2a2a2d; padding: 1rem; border-radius: 4px; }
+  </style>
+</head>
+<body>
+  <h1>LBE Dual-Agent Governance Pattern</h1>
+  <div class="metadata">
+    Date: 2026-09-18<br>
+    Classification: <span class="status status-pattern">GOVERNANCE ARCHITECTURE PATTERN</span><br>
+    Status: <span class="status status-active">SPECIFIED — READY FOR IMPLEMENTATION</span>
+  </div>
+
+  <h2>The Problem This Solves</h2>
+  <div class="critical">
+    <strong>⚠ Core Issue:</strong> When a coding agent focuses on implementation, governance documentation 
+    gets deprioritized. Intent tracking, PROJECT_INDEX updates, gate state management, and acceptance 
+    checkpoints are forgotten or done retroactively — leading to contradictions, stale documentation, 
+    and governance drift.
+  </div>
+
+  <div class="success">
+    <strong>✓ Solution:</strong> A dedicated <strong>governance subagent</strong> runs in parallel with the 
+    coding agent. The governance subagent's <em>only job</em> is to maintain governance truth — it never 
+    codes, it only documents, validates, and tracks.
+  </div>
+
+  <h2>Dual-Agent Architecture</h2>
+
+  <div class="dual-agent-container">
+    <!-- Coding Agent -->
+    <div class="agent-panel">
+      <div class="agent-header coding">
+        <span class="agent-title coding">◈ CODING AGENT</span>
+        <span class="agent-badge coding">PRIMARY</span>
+      </div>
+      <div class="agent-body">
+        <div class="agent-section">
+          <div class="agent-section-title">Focus</div>
+          <div class="agent-task active">Implementation / coding</div>
+          <div class="agent-task active">Debugging / testing</div>
+          <div class="agent-task active">Runtime integration</div>
+          <div class="agent-task active">Feature development</div>
+        </div>
+        <div class="agent-section">
+          <div class="agent-section-title">Does NOT Do</div>
+          <div class="agent-task" style="opacity: 0.5; border-left-color: #ff3b3b;">✗ Write intent docs</div>
+          <div class="agent-task" style="opacity: 0.5; border-left-color: #ff3b3b;">✗ Update PROJECT_INDEX</div>
+          <div class="agent-task" style="opacity: 0.5; border-left-color: #ff3b3b;">✗ Manage gate state</div>
+          <div class="agent-task" style="opacity: 0.5; border-left-color: #ff3b3b;">✗ Create checkpoints</div>
+          <div class="agent-task" style="opacity: 0.5; border-left-color: #ff3b3b;">✗ Track contradictions</div>
+        </div>
+        <div class="agent-section">
+          <div class="agent-section-title">Communicates To Governance</div>
+          <div class="agent-task">→ Announces intent before mutation</div>
+          <div class="agent-task">→ Reports completed changes</div>
+          <div class="agent-task">→ Requests gate validation</div>
+          <div class="agent-task">→ Signals slice completion</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Communication Bridge -->
+    <div class="bridge">
+      <div class="bridge-label">Communication</div>
+      <div class="bridge-arrow">→</div>
+      <div class="bridge-message">intent announced</div>
+      <div class="bridge-arrow">←</div>
+      <div class="bridge-message">index validated</div>
+      <div class="bridge-arrow">→</div>
+      <div class="bridge-message">mutation complete</div>
+      <div class="bridge-arrow">←</div>
+      <div class="bridge-message">docs updated</div>
+      <div class="bridge-arrow">→</div>
+      <div class="bridge-message">slice done</div>
+      <div class="bridge-arrow">←</div>
+      <div class="bridge-message">checkpoint created</div>
+    </div>
+
+    <!-- Governance Subagent -->
+    <div class="agent-panel">
+      <div class="agent-header governance">
+        <span class="agent-title governance">◉ GOVERNANCE SUBAGENT</span>
+        <span class="agent-badge governance">PARALLEL</span>
+      </div>
+      <div class="agent-body">
+        <div class="agent-section">
+          <div class="agent-section-title">Focus</div>
+          <div class="agent-task active">Intent tracking / documentation</div>
+          <div class="agent-task active">PROJECT_INDEX maintenance</div>
+          <div class="agent-task active">Gate state management</div>
+          <div class="agent-task active">Contradiction detection</div>
+          <div class="agent-task active">Acceptance checkpoint creation</div>
+        </div>
+        <div class="agent-section">
+          <div class="agent-section-title">Does NOT Do</div>
+          <div class="agent-task" style="opacity: 0.5; border-left-color: #ff3b3b;">✗ Write code</div>
+          <div class="agent-task" style="opacity: 0.5; border-left-color: #ff3b3b;">✗ Modify runtime</div>
+          <div class="agent-task" style="opacity: 0.5; border-left-color: #ff3b3b;">✗ Execute tools</div>
+          <div class="agent-task" style="opacity: 0.5; border-left-color: #ff3b3b;">✗ Make product decisions</div>
+        </div>
+        <div class="agent-section">
+          <div class="agent-section-title">Artifacts Maintained</div>
+          <div class="agent-task">PROJECT_INDEX.md (structural registry)</div>
+          <div class="agent-task">implementation-gates.json (machine state)</div>
+          <div class="agent-task">CURRENT_STATUS.md (human-readable state)</div>
+          <div class="agent-task">PROJECT_INTENT_LEDGER.md (decision history)</div>
+          <div class="agent-task">docs/acceptance/* (checkpoints)</div>
+          <div class="agent-task">DOCUMENT_INTENT_MANIFEST.md (doc roles)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h2>Interaction Protocol</h2>
+
+  <div class="timeline">
+    <div class="timeline-entry">
+      <div class="timeline-time">T+0</div>
+      <div class="timeline-dot"><div class="dot coding"></div><div class="line"></div></div>
+      <div class="timeline-content">
+        <span class="agent-tag coding">CODING</span>
+        Announces intent: "I need to add a new governed tool to the registry"
+      </div>
+    </div>
+    <div class="timeline-entry">
+      <div class="timeline-time">T+1</div>
+      <div class="timeline-dot"><div class="dot governance"></div><div class="line"></div></div>
+      <div class="timeline-content">
+        <span class="agent-tag governance">GOVERNANCE</span>
+        Validates against PROJECT_INDEX.md — confirms existing owner, checks mutation boundary, 
+        records intent in PROJECT_INTENT_LEDGER.md
+      </div>
+    </div>
+    <div class="timeline-entry">
+      <div class="timeline-time">T+2</div>
+      <div class="timeline-dot"><div class="dot governance"></div><div class="line"></div></div>
+      <div class="timeline-content">
+        <span class="agent-tag governance">GOVERNANCE</span>
+        Returns: "Intent registered. Owner: LBE audit/rule owner. Boundary: Active implementation intent + 
+        affected rule owner. Proceed."
+      </div>
+    </div>
+    <div class="timeline-entry">
+      <div class="timeline-time">T+3</div>
+      <div class="timeline-dot"><div class="dot coding"></div><div class="line"></div></div>
+      <div class="timeline-content">
+        <span class="agent-tag coding">CODING</span>
+        Implements the governed tool. Writes code, tests, validation.
+      </div>
+    </div>
+    <div class="timeline-entry">
+      <div class="timeline-time">T+4</div>
+      <div class="timeline-dot"><div class="dot coding"></div><div class="line"></div></div>
+      <div class="timeline-content">
+        <span class="agent-tag coding">CODING</span>
+        Reports: "Implementation complete. Files changed: rules/new_tool.py, tests/test_new_tool.py"
+      </div>
+    </div>
+    <div class="timeline-entry">
+      <div class="timeline-time">T+5</div>
+      <div class="timeline-dot"><div class="dot governance"></div><div class="line"></div></div>
+      <div class="timeline-content">
+        <span class="agent-tag governance">GOVERNANCE</span>
+        Updates PROJECT_INDEX.md if new structure added. Updates implementation-gates.json with current 
+        state. Records completion in PROJECT_INTENT_LEDGER.md. Checks for contradictions.
+      </div>
+    </div>
+    <div class="timeline-entry">
+      <div class="timeline-time">T+6</div>
+      <div class="timeline-dot"><div class="dot sync"></div><div class="line"></div></div>
+      <div class="timeline-content">
+        <span class="agent-tag governance">GOVERNANCE</span>
+        If slice complete: Creates acceptance checkpoint. Updates CURRENT_STATUS.md. 
+        Signals coding agent: "Governance truth updated. Ready for next intent."
+      </div>
+    </div>
+  </div>
+
+  <h2>Governance Subagent Responsibilities</h2>
+
+  <div class="grid-2">
+    <div>
+      <h3>Pre-Mutation (Before Coding Agent Changes Anything)</h3>
+      <div class="rule-card critical">
+        <div class="rule-title">1. Intent Registration</div>
+        <div class="rule-desc">Record the coding agent's stated intent in <code>PROJECT_INTENT_LEDGER.md</code> 
+        before any mutation occurs.</div>
+      </div>
+      <div class="rule-card critical">
+        <div class="rule-title">2. Index Validation</div>
+        <div class="rule-desc">Check <code>PROJECT_INDEX.md</code> — confirm the affected structure is indexed, 
+        has an owner, and the mutation is within the declared boundary.</div>
+      </div>
+      <div class="rule-card important">
+        <div class="rule-title">3. Gate State Check</div>
+        <div class="rule-desc">Verify <code>implementation-gates.json</code> allows the requested mutation. 
+        Check active slice, status, and rules.</div>
+      </div>
+      <div class="rule-card important">
+        <div class="rule-title">4. Contradiction Scan</div>
+        <div class="rule-desc">Check if the proposed intent contradicts any existing documented decision, 
+        locked contract, or canonical source.</div>
+      </div>
+    </div>
+    <div>
+      <h3>Post-Mutation (After Coding Agent Completes Changes)</h3>
+      <div class="rule-card critical">
+        <div class="rule-title">5. Index Update</div>
+        <div class="rule-desc">If new structure was added, register it in <code>PROJECT_INDEX.md</code> with 
+        purpose, owner, supporting contract, and mutation boundary.</div>
+      </div>
+      <div class="rule-card critical">
+        <div class="rule-title">6. Gate State Update</div>
+        <div class="rule-desc">Update <code>implementation-gates.json</code> to reflect current machine state. 
+        Update slice status if applicable.</div>
+      </div>
+      <div class="rule-card important">
+        <div class="rule-title">7. Status Documentation</div>
+        <div class="rule-desc">Update <code>CURRENT_STATUS.md</code> with human-readable current state. 
+        Ensure it matches machine gate.</div>
+      </div>
+      <div class="rule-card important">
+        <div class="rule-title">8. Completion Recording</div>
+        <div class="rule-desc">Record completion in <code>PROJECT_INTENT_LEDGER.md</code>. If slice complete, 
+        create acceptance checkpoint in <code>docs/acceptance/</code>.</div>
+      </div>
+    </div>
+  </div>
+
+  <h3>Continuous Monitoring (Always Running)</h3>
+  <div class="rule-card standard">
+    <div class="rule-title">9. Contradiction Detection</div>
+    <div class="rule-desc">Continuously scan for contradictions between: canonical sources, locked contracts, 
+    machine gate state, documentation, and actual implementation. Flag immediately when found.</div>
+  </div>
+  <div class="rule-card standard">
+    <div class="rule-title">10. Document Role Inventory</div>
+    <div class="rule-desc">Maintain <code>DOCUMENT_INTENT_MANIFEST.md</code> — every document must have a 
+    declared role, owner, and mutation boundary.</div>
+  </div>
+  <div class="rule-card standard">
+    <div class="rule-title">11. Publication Gate</div>
+    <div class="rule-desc">Block any publication/version work unless separately authorized by machine gate 
+    and user. Publication is never implicit.</div>
+  </div>
+
+  <h2>Governance Artifacts Maintained by Subagent</h2>
+
+  <table>
+    <tr>
+      <th>Artifact</th>
+      <th>Purpose</th>
+      <th>Update Trigger</th>
+      <th>Authority</th>
+    </tr>
+    <tr>
+      <td><code>PROJECT_INDEX.md</code></td>
+      <td>Root structural authority registry</td>
+      <td>Before any new structure mutation</td>
+      <td>LBE governance</td>
+    </tr>
+    <tr>
+      <td><code>implementation-gates.json</code></td>
+      <td>Machine authorization and active slice</td>
+      <td>Every state transition, slice change</td>
+      <td>Machine governance</td>
+    </tr>
+    <tr>
+      <td><code>CURRENT_STATUS.md</code></td>
+      <td>Human-readable current state</td>
+      <td>After every significant state change</td>
+      <td>Documentation owner</td>
+    </tr>
+    <tr>
+      <td><code>PROJECT_INTENT_LEDGER.md</code></td>
+      <td>Decision/intent history</td>
+      <td>Before and after every mutation</td>
+      <td>Governance subagent</td>
+    </tr>
+    <tr>
+      <td><code>docs/acceptance/*</code></td>
+      <td>Bounded acceptance checkpoints</td>
+      <td>Slice completion</td>
+      <td>Machine gate + acceptance owners</td>
+    </tr>
+    <tr>
+      <td><code>DOCUMENT_INTENT_MANIFEST.md</code></td>
+      <td>Document role inventory</td>
+      <td>New document creation</td>
+      <td>Documentation owner</td>
+    </tr>
+    <tr>
+      <td><code>docs/IMPLEMENTATION_PLAN.md</code></td>
+      <td>Ordered implementation sequence</td>
+      <td>Phase/slice changes</td>
+      <td>Implementation owner</td>
+    </tr>
+  </table>
+
+  <h2>Hard Rules (Non-Negotiable)</h2>
+
+  <div class="rule-card critical">
+    <div class="rule-title">RULE 1: UNINDEXED_STRUCTURE = NO_MUTATION</div>
+    <div class="rule-desc">If a new subsystem, adapter, provider, UI, database, integration, or directory is 
+    discovered, the governance subagent MUST register its purpose, owner, supporting contract, and mutation 
+    boundary in PROJECT_INDEX.md BEFORE the coding agent implements it.</div>
+  </div>
+
+  <div class="rule-card critical">
+    <div class="rule-title">RULE 2: No Parallel Architecture</div>
+    <div class="rule-desc">The governance subagent enforces one active slice at a time. No parallel 
+    architecture work. No next phase without PASS on current phase.</div>
+  </div>
+
+  <div class="rule-card critical">
+    <div class="rule-title">RULE 3: Fail Closed</div>
+    <div class="rule-desc">When in doubt, the governance subagent blocks. It does not guess, infer, or 
+    assume. If evidence is insufficient, status is <code>INSUFFICIENT_EVIDENCE</code> or <code>BLOCKED</code>.</div>
+  </div>
+
+  <div class="rule-card important">
+    <div class="rule-title">RULE 4: Coding Agent May Not Silently Change Gate</div>
+    <div class="rule-desc">Only the governance subagent (or explicit user authorization) may change gate state. 
+    The coding agent must request gate changes through the governance subagent.</div>
+  </div>
+
+  <div class="rule-card important">
+    <div class="rule-title">RULE 5: Documentation Is Not Code</div>
+    <div class="rule-desc">The governance subagent NEVER writes code. The coding agent NEVER writes governance 
+    documentation (except inline comments). Separation of concerns is absolute.</div>
+  </div>
+
+  <div class="rule-card important">
+    <div class="rule-title">RULE 6: README Is Not a Release Record</div>
+    <div class="rule-desc">The governance subagent ensures READMEs are not treated as status/release records. 
+    Current truth lives in <code>CURRENT_STATUS.md</code> and <code>implementation-gates.json</code>.</div>
+  </div>
+
+  <h2>Implementation Pattern</h2>
+
+  <div class="info">
+    <strong>How This Works in Practice:</strong>
+  </div>
+
+  <pre>
+# Coding Agent Session
+coding_agent = Cline  # or Codex, or any selected reasoning agent
+coding_agent.focus = "implementation"
+
+# Governance Subagent Session (parallel)
+governance_agent = LBE-governance  # dedicated governance process
+governance_agent.focus = "documentation and validation"
+
+# Interaction Loop
+while active_slice is not complete:
+    # 1. Coding agent announces intent
+    intent = coding_agent.announce_intent("add governed tool X")
+    
+    # 2. Governance subagent validates and registers
+    governance_agent.register_intent(intent)
+    governance_agent.validate_against_index(intent)
+    governance_agent.check_gate_state(intent)
+    approval = governance_agent.approve_or_block(intent)
+    
+    if approval.blocked:
+        coding_agent.receive_feedback(approval.reason)
+        continue
+    
+    # 3. Coding agent implements
+    result = coding_agent.implement(intent)
+    
+    # 4. Governance subagent updates all artifacts
+    governance_agent.update_project_index(result)
+    governance_agent.update_gate_state(result)
+    governance_agent.update_current_status(result)
+    governance_agent.record_completion(intent, result)
+    governance_agent.scan_for_contradictions()
+    
+    # 5. If slice complete, create checkpoint
+    if governance_agent.is_slice_complete():
+        governance_agent.create_acceptance_checkpoint()
+</pre>
+
+  <h2>Why This Pattern Matters for LBE</h2>
+
+  <div class="grid-2">
+    <div class="card">
+      <h3 style="color: #ff3b3b;">Without Governance Subagent</h3>
+      <ul>
+        <li>Coding agent forgets to update PROJECT_INDEX</li>
+        <li>Gate state drifts from actual implementation</li>
+        <li>Contradictions accumulate silently</li>
+        <li>Acceptance checkpoints are never created</li>
+        <li>Documentation becomes stale</li>
+        <li>Machine gate becomes unreliable</li>
+        <li>Publication blocked by stale state</li>
+        <li>Final product acceptance never closes</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3 style="color: #22c55e;">With Governance Subagent</h3>
+      <ul>
+        <li>PROJECT_INDEX always reflects current structure</li>
+        <li>Gate state matches machine truth</li>
+        <li>Contradictions caught immediately</li>
+        <li>Acceptance checkpoints created at slice end</li>
+        <li>Documentation stays current</li>
+        <li>Machine gate remains authoritative</li>
+        <li>Publication path remains clear</li>
+        <li>Final product acceptance can close</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2>Connection to Current LBE Blockers</h2>
+
+  <div class="warning">
+    <strong>The current LBE workspace has exactly this problem.</strong> The backend has 880 commits but 
+    the machine gate is <code>BLOCKED_BY_SOURCE_CONTRADICTION</code>. The Textual TUI was classified as 
+    PREVIEW/synthetic but documentation wasn't updated fast enough. The Sep 5 locked contract wasn't 
+    implemented but no governance process caught the drift.
+    <br><br>
+    A governance subagent running in parallel would have:
+    <ul>
+      <li>Caught the Textual/Cline surface contradiction earlier</li>
+      <li>Flagged the missing structural UI implementation immediately</li>
+      <li>Kept CURRENT_STATUS.md aligned with machine gate state</li>
+      <li>Created acceptance checkpoints for each completed slice</li>
+      <li>Prevented the 7+ consecutive CI failures by catching drift early</li>
+    </ul>
+  </div>
+
+  <h2>Next Steps</h2>
+
+  <ol style="margin-left: 2rem;">
+    <li>
+      <strong>Implement governance subagent as parallel process</strong><br>
+      Can be a separate Cline session, a Python script, or a BirdEye MCP tool. 
+      Must have read/write access to all governance artifacts.
+    </li>
+    <li>
+      <strong>Define communication protocol</strong><br>
+      How does coding agent announce intent? How does governance subagent respond? 
+      File-based, MCP tool, or shared state?
+    </li>
+    <li>
+      <strong>Test with current active slice</strong><br>
+      Run both agents on <code>FINAL_PRODUCT_SOURCE_RECONCILIATION</code>. 
+      Verify governance subagent catches contradictions and maintains truth.
+    </li>
+    <li>
+      <strong>Integrate with BirdEye MCP</strong><br>
+      Governance subagent can use BirdEye for workspace queries, memory access, 
+      and skills retrieval to support its documentation work.
+    </li>
+  </ol>
+
+  <div class="metadata" style="margin-top: 3rem; padding-top: 1rem; border-top: 1px solid #2a2a2d;">
+    Document generated: 2026-09-18<br>
+    Classification: GOVERNANCE ARCHITECTURE PATTERN<br>
+    Authority: LBE governance<br>
+    Status: <span class="status status-active">SPECIFIED — READY FOR IMPLEMENTATION</span>
+  </div>
+</body>
+</html>

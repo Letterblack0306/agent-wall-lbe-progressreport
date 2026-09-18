@@ -1,7 +1,7 @@
 import { useState } from 'react'
 
 export default function App() {
-  const [selectedView, setSelectedView] = useState<'landing' | 'react-proto' | 'cockpit' | 'reconciliation' | 'cline-seam'>('landing')
+  const [selectedView, setSelectedView] = useState<'landing' | 'react-proto' | 'cockpit' | 'reconciliation' | 'cline-seam' | 'governance'>('landing')
 
   if (selectedView === 'react-proto') {
     return (
@@ -63,6 +63,22 @@ export default function App() {
           </button>
         </div>
         <iframe src="/cline-dependency-seam.html" className="w-full h-full border-0" title="Cline Dependency Seam Analysis" />
+      </div>
+    )
+  }
+
+  if (selectedView === 'governance') {
+    return (
+      <div className="h-screen w-screen bg-[#0b0b0c] text-[#e1e1e6] font-mono">
+        <div className="fixed top-2 right-2 z-50">
+          <button
+            onClick={() => setSelectedView('landing')}
+            className="px-3 py-1.5 bg-[#1c1c1f] border border-[#2a2a2d] rounded text-xs text-[#8e8e93] hover:text-[#e1e1e6] transition-colors"
+          >
+            ← Back to Hub
+          </button>
+        </div>
+        <iframe src="/governance-subagent.html" className="w-full h-full border-0" title="Dual-Agent Governance Pattern" />
       </div>
     )
   }
@@ -223,6 +239,41 @@ export default function App() {
               Open →
             </div>
           </button>
+
+          {/* Dual-Agent Governance Pattern */}
+          <button
+            onClick={() => setSelectedView('governance')}
+            className="bg-[#141416] border border-[#2a2a2d] rounded-lg p-5 text-left hover:border-[#22c55e] transition-colors group md:col-span-2"
+          >
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-sm font-bold group-hover:text-[#22c55e]">Dual-Agent Governance Pattern</h3>
+              <span className="text-[10px] px-2 py-0.5 bg-green-900/40 text-green-400 rounded border border-green-800">
+                GOVERNANCE ARCHITECTURE
+              </span>
+            </div>
+            <p className="text-xs text-[#8e8e93] mb-3 leading-relaxed">
+              Architecture pattern where a coding agent and governance subagent work in parallel. 
+              The coding agent focuses on implementation while the governance subagent maintains 
+              documentation, tracks intent, manages gate state, and catches contradictions.
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-[10px] text-[#8e8e93]">
+              <div>
+                <div className="font-bold text-[#e1e1e6] mb-1">Problem Solved</div>
+                <div>Coding agents forget governance docs</div>
+              </div>
+              <div>
+                <div className="font-bold text-[#e1e1e6] mb-1">Pattern</div>
+                <div>Parallel agents, separated concerns</div>
+              </div>
+              <div>
+                <div className="font-bold text-[#e1e1e6] mb-1">Status</div>
+                <div className="text-[#22c55e]">SPECIFIED — READY</div>
+              </div>
+            </div>
+            <div className="mt-3 text-[10px] text-[#22c55e]">
+              Open →
+            </div>
+          </button>
         </div>
 
         {/* Architecture flow */}
@@ -272,6 +323,11 @@ export default function App() {
               <span className="text-[#a855f7]">▸</span>
               <code className="text-[#e1e1e6]">/cline-dependency-seam.html</code>
               <span className="text-[#8e8e93]">— Cline dependency recovery seam analysis</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <span className="text-[#22c55e]">▸</span>
+              <code className="text-[#e1e1e6]">/governance-subagent.html</code>
+              <span className="text-[#8e8e93]">— Dual-agent governance pattern specification</span>
             </div>
           </div>
         </div>
