@@ -68,7 +68,7 @@ Deep analysis of the embedded Cline client dependency, documenting the pinned co
 
 **Status:**
 - Analysis complete, recovery path identified
-- Option A (bounded adapter) is smallest safe seam
+- Visible Cline UI recovery is superseded; Rust/Ratatui is the canonical product client
 - Does not require restoring full historical Cline workspace
 
 ### 6. Dual-Agent Governance Pattern (`/governance-subagent.html`)
