@@ -1,4 +1,6 @@
 # LBE Workspace Ecosystem Audit Report
+> **2026-09-18 PRODUCT-OWNER SUPERSESSION:** The visible product client is now the LBE-owned Rust/Ratatui implementation. Existing HTML/React work is retained as the LBE visual/interaction contract. Cline remains headless reasoning/provider/model/continuation mechanics only. Recommendations below that say to implement the product shell in Cline CLI, change audit->coding directly, or remove the Rust binary as the current product path are historical and must not be executed without fresh owner/runtime evidence.
+
 **Date:** September 17, 2026  
 **Scope:** Full 4-repository Letterblack ecosystem  
 **Status:** PARTIALLY ON PLAN — Active Blockers Present
